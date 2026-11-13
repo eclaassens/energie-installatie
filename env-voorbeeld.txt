@@ -26,5 +26,11 @@ SENSOR_OUTDOOR_TEMP=
 SENSOR_INDOOR_TEMP=
 SENSOR_INDOOR_TEMP_OUD=
 
+# Thuisaccu die er al is (bv. HomeWizard Plug-In Battery): wat erin gaat en eruit komt (kWh, oplopend) en de
+# laadtoestand (%). Meer accu's: entity-id's met komma's ertussen, in dezelfde volgorde.
+SENSOR_BATTERY_ENERGY_IN=
+SENSOR_BATTERY_ENERGY_OUT=
+SENSOR_BATTERY_SOC=
+
 # Tarieven naar Home Assistant sturen via MQTT: uit
 MQTT_HOST=

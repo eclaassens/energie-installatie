@@ -46,6 +46,9 @@ De app wil precies deze, als entity-id. Lees van elke kandidaat de state en attr
 | `SENSOR_OUTDOOR_TEMP` | buitentemperatuur | °C, measurement |
 | `SENSOR_INDOOR_TEMP` | binnentemperatuur (woonkamer/thermostaat) | °C, measurement |
 | `SENSOR_INDOOR_TEMP_OUD` | een oudere binnensensor die vroegere jaren vult | meestal leeg |
+| `SENSOR_BATTERY_ENERGY_IN` | thuisaccu: energie erin (laden) | kWh, total_increasing; geen accu → leeg |
+| `SENSOR_BATTERY_ENERGY_OUT` | thuisaccu: energie eruit (ontladen) | kWh, total_increasing |
+| `SENSOR_BATTERY_SOC` | thuisaccu: laadtoestand | %, measurement |
 
 Waar je ze vindt:
 - **Vermogen afname/teruglevering**: op hetzelfde apparaat als de meterstanden (`ha_get_device`), bv.
@@ -58,6 +61,12 @@ Waar je ze vindt:
   attribuut, dus dan in stap 3 een helper.
 - **Binnen**: een temperatuursensor in de woonkamer, of de `current_temperature` van de thermostaat
   (`climate.*`; dan een helper).
+- **Thuisaccu** (bv. HomeWizard Plug-In Battery, model HWE-BAT): op het apparaat van de accu de tellers
+  "Energie import" (= laden) en "Energie export" (= ontladen) en "Laadtoestand". Meer accu's: per instelling de
+  entity-id's met komma's ertussen, steeds in dezelfde volgorde. Staat de accu in het energiedashboard (type `battery`),
+  dan zijn `stat_energy_to` (laden) en `stat_energy_from` (ontladen) dezelfde tellers. Andere merken (Marstek,
+  Anker Solix, …) werken net zo, als er kWh-tellers zijn. Heeft de integratie alleen een vermogen (W), maak dan in
+  stap 3 de tellers met een helper.
 
 Een sensor moet al langer bestaan om de geschiedenis te hebben: de app haalt de uurstatistiek van HA op,
 jaren terug. Een nieuwe helper begint vandaag. Zeg dat erbij.
@@ -87,6 +96,12 @@ twijfel eerst het formulier (zonder config) en vul de velden zoals HA ze noemt. 
 
 Vervang NAAM, VERMOGEN en de weer-entity (`weather.forecast_home`, `weather.buienradar`, …) door de echte
 entity-id's en test elke template eerst met `ha_eval_template`.
+
+- **Accu met alleen een vermogen**: helper `integration` (Integraal, Riemann-som, methode links), bron het
+  laadvermogen, eenheidsprefix k, tijdseenheid uur → kWh-teller "Accu geladen"; net zo voor het ontlaadvermogen.
+  Is er één vermogen dat negatief wordt bij ontladen (of juist bij laden: kijk naar de staat tijdens het laden), maak
+  dan eerst de twee template-sensoren hierboven (positief en negatief deel) en daarna de twee integralen. Zulke
+  tellers beginnen vandaag; voor een nieuwe accu is dat geen bezwaar.
 
 Neem de eenheid van het bronvermogen over (kW of W). Voor panelen met alleen een kWh-teller: helper
 `derivative`, bron de kWh-teller, tijdseenheid uur, eenheidsprefix k: dat geeft kW. Controleer daarna
@@ -120,6 +135,9 @@ PV_KWP=
 SENSOR_OUTDOOR_TEMP=sensor.…
 SENSOR_INDOOR_TEMP=sensor.…
 SENSOR_INDOOR_TEMP_OUD=
+SENSOR_BATTERY_ENERGY_IN=sensor.…
+SENSOR_BATTERY_ENERGY_OUT=sensor.…
+SENSOR_BATTERY_SOC=sensor.…
 MQTT_HOST=
 ```
 
@@ -173,8 +191,10 @@ Meldingen van het script en wat je dan doet:
 
    "Geldig vanaf" staat standaard op de eerste dag met meetgegevens; laat dat zo. Een nieuw contract
    komt later als nieuwe periode.
-3. **Maandbedrag** (op Nu): het termijnbedrag en de startdatum van het afrekenjaar, van de jaarnota.
-4. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken. De gegevens blijven bewaard.
+3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
+   laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
+4. **Maandbedrag** (op Nu): het termijnbedrag en de startdatum van het afrekenjaar, van de jaarnota.
+5. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken. De gegevens blijven bewaard.
 
 De pc hoeft niet altijd aan te staan: de app haalt de uurcijfers later alsnog uit HA. Alleen
 minuutdetails ouder dan ~10 dagen (zo lang bewaart HA ze) gaan verloren als de pc lang uit staat.
