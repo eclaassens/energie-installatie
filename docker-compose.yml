@@ -1,0 +1,22 @@
+# De energie-app op een Windows-pc (Docker Desktop). Het installatiescript zet dit bestand
+# in %USERPROFILE%\energie-app, naast de .env met jouw instellingen.
+name: energie
+
+services:
+  app:
+    image: ghcr.io/eclaassens/energie-data-app:latest
+    container_name: energie-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATA_DIR=/app/data
+    volumes:
+      # Een Docker-volume, geen map op de C-schijf: de database (SQLite) loopt daar niet altijd goed.
+      - energie-data:/app/data
+    ports:
+      - "8000:8000"
+    mem_limit: 512m
+
+volumes:
+  energie-data:

@@ -1,0 +1,30 @@
+# Instellingen van de energie-app. Claude vult dit in; jij plakt alleen je token achter HA_TOKEN=.
+# Een regel met niets achter de = betekent: deze sensor heb ik niet.
+
+# Home Assistant, zoals deze pc hem bereikt (bij voorkeur het IP-adres, bv. http://192.168.1.20:8123)
+HA_URL=
+# Je eigen token uit Home Assistant (Profiel > Beveiliging > Langlevende toegangstokens). Nooit in een chat plakken.
+HA_TOKEN=
+
+# Slimme meter: meterstanden (kWh, oplopend). Tarief 1 = dal, tarief 2 = normaal.
+SENSOR_ENERGY_CONSUMED_T1=
+SENSOR_ENERGY_CONSUMED_T2=
+SENSOR_ENERGY_PRODUCED_T1=
+SENSOR_ENERGY_PRODUCED_T2=
+# Slimme meter: vermogen nu (W of kW), afname en teruglevering apart en allebei positief
+SENSOR_POWER_CONSUMED=
+SENSOR_POWER_PRODUCED=
+# Gasmeter (m³, oplopend)
+SENSOR_GAS=
+
+# Zonnepanelen: vermogen nu (W of kW) en het piekvermogen in kWp (aantal panelen × Wp / 1000)
+SENSOR_PV_POWER=
+PV_KWP=
+
+# Temperatuur (°C): buiten, en binnen (de thermostaat)
+SENSOR_OUTDOOR_TEMP=
+SENSOR_INDOOR_TEMP=
+SENSOR_INDOOR_TEMP_OUD=
+
+# Tarieven naar Home Assistant sturen via MQTT: uit
+MQTT_HOST=
