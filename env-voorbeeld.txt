@@ -32,5 +32,9 @@ SENSOR_BATTERY_ENERGY_IN=
 SENSOR_BATTERY_ENERGY_OUT=
 SENSOR_BATTERY_SOC=
 
-# Tarieven naar Home Assistant sturen via MQTT: uit
+# Tarieven naar Home Assistant sturen via MQTT (mag leeg blijven: dan uit). Nodig: de Mosquitto-add-on in HA.
+# MQTT_HOST is het IP-adres van HA (zonder http en poort). Mosquitto wil een login: een HA-gebruiker
+# (bv. energie-app) en zijn wachtwoord. Het wachtwoord typ je zelf hier in, nooit in een chat.
 MQTT_HOST=
+MQTT_USER=
+MQTT_PASSWORD=

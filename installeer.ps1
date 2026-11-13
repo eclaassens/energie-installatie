@@ -72,6 +72,7 @@ function Install-EnergieApp {
         Write-Host 'Kladblok gaat open met de instellingen:' -ForegroundColor Yellow
         Write-Host ' - vervang alles door de regels die Claude je gaf (of vul ze in);'
         Write-Host ' - plak je Home Assistant-token achter HA_TOKEN= (en nergens anders);'
+        Write-Host ' - tarieven naar HA (MQTT)? typ dan het wachtwoord van de HA-gebruiker achter MQTT_PASSWORD=;'
         Write-Host ' - sla op (Ctrl+S) en sluit Kladblok. Daarna gaat de installatie verder.'
         Start-Process notepad.exe -ArgumentList "`"$env_pad`"" -Wait
     }
@@ -97,6 +98,11 @@ function Install-EnergieApp {
         # Een regel die helemaal ontbreekt valt terug op de sensornamen van een ander huishouden.
         Fout ("Deze regels ontbreken in de instellingen: " + ($ontbreekt -join ', ') + ". Zet ze erin (leeg achter de = als je de sensor niet hebt).")
         return
+    }
+    if ($waarden['MQTT_HOST'] -and -not $waarden['MQTT_USER']) {
+        # Mosquitto in HA laat niemand toe zonder login; zonder gebruiker mislukt elk bericht.
+        Write-Host 'Let op: MQTT_HOST staat aan, maar MQTT_USER is leeg. Mosquitto in Home Assistant wil een login;' -ForegroundColor Yellow
+        Write-Host '        vul MQTT_USER en MQTT_PASSWORD in (een HA-gebruiker), of maak MQTT_HOST leeg.' -ForegroundColor Yellow
     }
     try {
         $antwoord = Invoke-RestMethod -Uri "$url/api/" -Headers @{ Authorization = "Bearer $token" } -TimeoutSec 15 -ErrorAction Stop

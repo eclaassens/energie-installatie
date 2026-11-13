@@ -14,6 +14,7 @@ gebruiker met één regel in PowerShell.
 - Schrijf Nederlands, kort en zonder vakjargon; de gebruiker is geen programmeur. Eén stap tegelijk.
 - **Vraag nooit om het HA-token en laat het nooit in de chat plakken.** De gebruiker zet het zelf in
   het instellingenbestand. Krijg je het toch, zeg dan dat hij het in HA moet intrekken en een nieuw maken.
+  Hetzelfde geldt voor het MQTT-wachtwoord (stap 4b): dat typt hij zelf in Kladblok.
 - Verander niets in HA zonder het eerst te vragen. Alleen lezen mag altijd. Het enige wat je eventueel
   aanmaakt zijn de hulpsensoren (helpers) uit stap 3, na een "ja". Verwijder nooit iets.
 - Gok niet: weet je niet welke sensor het is, laat de gebruiker kiezen uit wat je vond.
@@ -114,6 +115,22 @@ thuisnetwerk met poort, bv. `http://192.168.1.20:8123` (`ha_get_overview` → ba
 adres dat de gebruiker in zijn browser gebruikt). Niet `homeassistant.local`: Docker kan dat vaak niet
 vinden. Een https-adres van buitenaf (Nabu Casa, DuckDNS) werkt ook.
 
+## Stap 4b: tarieven naar HA via MQTT (optioneel)
+
+Met MQTT zet de app de tarieven van het contract en de sync-status als sensoren in HA (apparaat
+"Energiecontract", `sensor.energiecontract_*`), bv. voor de kosten in het energiedashboard. Zonder MQTT werkt
+de app ook; vraag of hij dit wil. Nee of twijfel: `MQTT_HOST`, `MQTT_USER` en `MQTT_PASSWORD` blijven leeg.
+
+Wil hij het:
+1. Controleer dat er een broker is: de integratie `mqtt` (`ha_get_integration`) en meestal de add-on
+   Mosquitto broker. Geen van beide: laat MQTT dan weg (installeren van een add-on hoort niet bij deze klus).
+2. `MQTT_HOST` = het IP-adres van HA uit stap 4, zonder `http://` en zonder poort (de add-on luistert op 1883).
+3. **Mosquitto laat niemand toe zonder login.** Zonder `MQTT_USER`/`MQTT_PASSWORD` meldt de app "de broker
+   weigert de verbinding". Laat hem een aparte HA-gebruiker maken: Instellingen → Personen → **Persoon
+   toevoegen**, naam "energie-app", **Mag inloggen** aan, gebruikersnaam `energie-app`, een wachtwoord,
+   **Alleen lokaal inloggen** aan, géén beheerder. `MQTT_USER=energie-app`; het wachtwoord typt hij zelf in
+   Kladblok achter `MQTT_PASSWORD=` (nooit in de chat).
+
 ## Stap 5: het instellingenbestand
 
 Geef de gebruiker het hele bestand in één codeblok, met **alle** regels hieronder; een sensor die er
@@ -139,11 +156,14 @@ SENSOR_BATTERY_ENERGY_IN=sensor.…
 SENSOR_BATTERY_ENERGY_OUT=sensor.…
 SENSOR_BATTERY_SOC=sensor.…
 MQTT_HOST=
+MQTT_USER=
+MQTT_PASSWORD=
 ```
 
 Leg dan uit hoe hij een token maakt: in HA linksonder op zijn naam (profiel) → tabblad **Beveiliging**
 → onderaan **Langlevende toegangstokens** → **Token aanmaken**, naam "energie-app" → kopiëren. Het
-token is maar één keer te zien; hij plakt het straks in Kladblok achter `HA_TOKEN=`.
+token is maar één keer te zien; hij plakt het straks in Kladblok achter `HA_TOKEN=`. Met MQTT typt hij daar ook
+het wachtwoord van de HA-gebruiker achter `MQTT_PASSWORD=`.
 
 ## Stap 6: installeren op de pc
 
@@ -157,8 +177,8 @@ irm https://raw.githubusercontent.com/eclaassens/energie-installatie/main/instal
 Het script:
 1. Controleert Docker Desktop en biedt aan het te installeren. Daarna: pc herstarten, Docker Desktop
    openen, voorwaarden accepteren (inloggen hoeft niet), en de regel opnieuw plakken.
-2. Opent Kladblok: alles vervangen door jouw codeblok, het token achter `HA_TOKEN=` plakken, opslaan,
-   Kladblok sluiten.
+2. Opent Kladblok: alles vervangen door jouw codeblok, het token achter `HA_TOKEN=` plakken (en met MQTT
+   het wachtwoord achter `MQTT_PASSWORD=`), opslaan, Kladblok sluiten.
 3. Test de verbinding met HA, haalt de app op en opent http://localhost:8000.
 
 Meldingen van het script en wat je dan doet:
@@ -170,6 +190,10 @@ Meldingen van het script en wat je dan doet:
 | "Deze regels ontbreken" | de genoemde regels toevoegen, leeg als de sensor er niet is |
 | "Docker draait niet" | Docker Desktop openen en wachten op "Engine running" |
 | Docker Desktop vraagt om WSL of virtualisatie | de aanwijzing van Docker Desktop volgen (soms een Windows-update of herstart) |
+| "MQTT_HOST staat aan, maar MQTT_USER is leeg" | de HA-gebruiker uit stap 4b maken en invullen, of MQTT_HOST leeg maken |
+
+Instellingen later aanpassen (bv. MQTT): dezelfde regel in PowerShell nog eens plakken en kiezen voor
+aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
 
 ## Stap 7: na de installatie
 
@@ -193,8 +217,16 @@ Meldingen van het script en wat je dan doet:
    komt later als nieuwe periode.
 3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
-4. **Maandbedrag** (op Nu): het termijnbedrag en de startdatum van het afrekenjaar, van de jaarnota.
-5. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken. De gegevens blijven bewaard.
+4. **MQTT** (als het aan staat): bij Beheer → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
+   wat HA nu heeft**: alle berichten gelijk. In HA verschijnt het apparaat "Energiecontract". Meldingen:
+
+   | Melding | Oplossing |
+   |---|---|
+   | "weigert de verbinding … MQTT_USER en MQTT_PASSWORD ontbreken" | HA-gebruiker maken (stap 4b), invullen via het script |
+   | "weigert gebruiker … klopt niet" | gebruikersnaam of wachtwoord nakijken; de gebruiker moet bestaan en mag niet uitgeschakeld zijn |
+   | "geen antwoord van de broker" of "kan niet publiceren naar …" | draait de Mosquitto-add-on? klopt het IP-adres (zonder http en poort)? |
+5. **Maandbedrag** (op Nu): het termijnbedrag en de startdatum van het afrekenjaar, van de jaarnota.
+6. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken. De gegevens blijven bewaard.
 
 De pc hoeft niet altijd aan te staan: de app haalt de uurcijfers later alsnog uit HA. Alleen
 minuutdetails ouder dan ~10 dagen (zo lang bewaart HA ze) gaan verloren als de pc lang uit staat.

@@ -31,17 +31,19 @@ zelf:
    ```
 
 3. In het **Kladblok** dat opengaat de instellingen van Claude plakken, je token achter `HA_TOKEN=`
-   zetten, opslaan en sluiten.
+   zetten, opslaan en sluiten. Wil je de tarieven ook in Home Assistant (MQTT), dan typ je daar ook het
+   wachtwoord van de HA-gebruiker achter `MQTT_PASSWORD=`.
 
 Daarna opent de app vanzelf op http://localhost:8000. Vul bij **Beheer** de tarieven van je contract
 in; Claude helpt als je een foto van je jaarnota stuurt.
 
-**Bijwerken** naar een nieuwe versie: plak dezelfde regel nog eens in PowerShell.
+**Bijwerken** naar een nieuwe versie: plak dezelfde regel nog eens in PowerShell. Daarmee pas je ook je
+instellingen aan (kies "j" bij de vraag om ze aan te passen).
 
 ## Wat er op je pc komt
 
 - Docker Desktop (als het er nog niet is).
-- De map `energie-app` in je gebruikersmap, met `docker-compose.yml` en `.env` (je instellingen en
-  token; deel dat bestand niet).
+- De map `energie-app` in je gebruikersmap, met `docker-compose.yml` en `.env` (je instellingen,
+  token en eventueel MQTT-wachtwoord; deel dat bestand niet).
 - Een Docker-volume `energie_energie-data` met de database. Weghalen: in Docker Desktop de container
   `energie-app` en dat volume verwijderen.
