@@ -228,5 +228,42 @@ aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
 5. **Maandbedrag** (op Nu): het termijnbedrag en de startdatum van het afrekenjaar, van de jaarnota.
 6. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken. De gegevens blijven bewaard.
 
+## Stap 8: oudere verbruikshistorie (optioneel)
+
+De app begint bij de eerste dag met meterstanden in HA. Heeft de gebruiker oudere cijfers (export van
+mijnenergiedata.nl / slimmemeterportal, de leverancier, een spreadsheet met meterstanden), dan kunnen die erbij
+via de importmap. **Het formaat bepaalt waar het terechtkomt; alleen deze twee tellen mee in de dagcijfers:**
+
+| Kolommen | Wat | Telt mee in |
+|---|---|---|
+| `ts,afname_dal,afname_normaal,terug_dal,terug_normaal` | stroom: **verbruik** in kWh per interval (kwartier, uur of dag) | Verbruik, Kosten, Nu |
+| `ts,gas` | gas: **verbruik** in m³ per interval (uur of dag) | idem |
+| `entity_id,ts,value` | minuutdata van één sensor (herstel van gaten) | alleen de minuutgrafiek van een dag, **niet** de dagcijfers |
+
+Regels:
+- **Verbruik, geen meterstanden**: het verschil tussen twee opeenvolgende standen. Een stand van 00:00 op dag D
+  is het begin van dag D.
+- **Alle kolommen gevuld**, anders valt de rij weg. Geen teruglevering → `0`. Dal én normaal zijn nodig; met alleen
+  één tarief ontbreekt de helft.
+- **`ts` met tijdzone**. Voor dagcijfers: 12:00 Nederlandse tijd, bv. `2022-01-01T12:00:00+01:00` (zomer `+02:00`);
+  dan valt de rij nooit op een andere dag (gas schuift de app 2 uur op).
+- Een **dag met een meterstand in HA gebruikt altijd HA**; de import vult alleen dagen zonder HA-meterdata. Er is
+  geen ondergrens om te verleggen: oudere dagen komen er vanzelf voor.
+- Elk bestand telt één keer (op inhoud); rijen die er al zijn, blijven staan.
+
+Voorbeeld:
+```
+ts,afname_dal,afname_normaal,terug_dal,terug_normaal
+2022-01-01T12:00:00+01:00,4.123,6.210,0,0
+2022-07-01T12:00:00+02:00,2.050,3.400,1.200,5.800
+```
+
+Zet het bestand (naam vrij, `.csv`) in de app; de gebruiker plakt in PowerShell:
+```
+docker cp $env:USERPROFILE\Downloads\historie.csv energie-app:/app/data/import/
+```
+De app verwerkt het binnen een minuut en rekent de dagcijfers opnieuw uit. Controle: Beheer → **Ruwe data**,
+kolom **bron** = Slimmemeterportal voor die maanden.
+
 De pc hoeft niet altijd aan te staan: de app haalt de uurcijfers later alsnog uit HA. Alleen
 minuutdetails ouder dan ~10 dagen (zo lang bewaart HA ze) gaan verloren als de pc lang uit staat.
