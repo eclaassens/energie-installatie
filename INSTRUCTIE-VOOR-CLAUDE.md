@@ -222,8 +222,11 @@ aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
    | Contractkorting | €/jaar | welkomstkorting e.d., anders 0 |
 
    "Geldig vanaf" staat standaard op de eerste dag met meetgegevens; laat dat zo. Een nieuw contract
-   komt later als nieuwe periode. Heeft hij oudere jaarnota's (zeker met historie uit stap 8), voeg die contracten
-   dan toe als eigen periode met hun eigen "geldig vanaf": anders rekent de app vroegere jaren met de prijzen van nu.
+   komt later als nieuwe periode (Beheer → Tarieven → **Nieuwe periode**; een periode wijzigen of verwijderen:
+   **Bekijken** op die rij). Heeft hij oudere jaarnota's (zeker met historie uit stap 8), dan rekent de app vroegere
+   jaren anders met de prijzen van nu. Voeg dan elk contract, ook het huidige, toe als nieuwe periode met zijn eigen
+   startdatum; de volgorde maakt niet uit (de periode waarin die datum valt, loopt tot de dag ervoor). Zet daarna in de
+   eerste periode (Bekijken) de tarieven van het contract dat gold op de eerste dag met meetgegevens.
 3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
 4. **MQTT** (als het aan staat): bij Beheer → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
