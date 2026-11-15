@@ -104,6 +104,11 @@ function Install-EnergieApp {
         Write-Host 'Let op: MQTT_HOST staat aan, maar MQTT_USER is leeg. Mosquitto in Home Assistant wil een login;' -ForegroundColor Yellow
         Write-Host '        vul MQTT_USER en MQTT_PASSWORD in (een HA-gebruiker), of maak MQTT_HOST leeg.' -ForegroundColor Yellow
     }
+    if ($waarden['SENSOR_GAS'] -and -not $waarden['GAS_CORRECTIE']) {
+        # Zonder waarde rekent de app met 1,022: de gascorrectie van een ander huishouden.
+        Write-Host 'Let op: GAS_CORRECTIE ontbreekt. De app rekent dan met 1,022 (de factor van een ander huis).' -ForegroundColor Yellow
+        Write-Host '        Zet GAS_CORRECTIE= met de factor van je jaarnota erin, of 1 als je die niet weet.' -ForegroundColor Yellow
+    }
     try {
         $antwoord = Invoke-RestMethod -Uri "$url/api/" -Headers @{ Authorization = "Bearer $token" } -TimeoutSec 15 -ErrorAction Stop
         Write-Host "Home Assistant antwoordt: $($antwoord.message)"

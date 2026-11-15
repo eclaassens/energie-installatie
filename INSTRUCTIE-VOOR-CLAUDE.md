@@ -46,6 +46,7 @@ De app wil precies deze, als entity-id. Lees van elke kandidaat de state en attr
 | `PV_KWP` | piekvermogen van de panelen | getal in kWp: vraag aantal panelen × wattpiek ÷ 1000 |
 | `SENSOR_OUTDOOR_TEMP` | buitentemperatuur | °C, measurement |
 | `SENSOR_INDOOR_TEMP` | binnentemperatuur (woonkamer/thermostaat) | °C, measurement |
+| `GAS_CORRECTIE` | factor waarmee de leverancier de gemeten m³ omrekent | getal, zie hieronder; **nooit leeg** |
 | `SENSOR_INDOOR_TEMP_OUD` | een oudere binnensensor die vroegere jaren vult | meestal leeg |
 | `SENSOR_BATTERY_ENERGY_IN` | thuisaccu: energie erin (laden) | kWh, total_increasing; geen accu → leeg |
 | `SENSOR_BATTERY_ENERGY_OUT` | thuisaccu: energie eruit (ontladen) | kWh, total_increasing |
@@ -68,6 +69,11 @@ Waar je ze vindt:
   dan zijn `stat_energy_to` (laden) en `stat_energy_from` (ontladen) dezelfde tellers. Andere merken (Marstek,
   Anker Solix, …) werken net zo, als er kWh-tellers zijn. Heeft de integratie alleen een vermogen (W), maak dan in
   stap 3 de tellers met een helper.
+
+**Gascorrectie**: de leverancier rekent niet met de m³ van de meter, maar met een gecorrigeerd volume. De factor
+staat op de jaarnota bij gas ("correctiefactor", of gecorrigeerd verbruik ÷ gemeten verbruik, bv. 1.022). Vraag om
+de jaarnota en reken hem uit; vind je hem niet, of geen gas: `1`. Laat de regel nooit leeg: dan rekent de app met de
+factor van een ander huishouden.
 
 Een sensor moet al langer bestaan om de geschiedenis te hebben: de app haalt de uurstatistiek van HA op,
 jaren terug. Een nieuwe helper begint vandaag. Zeg dat erbij.
@@ -147,6 +153,7 @@ SENSOR_ENERGY_PRODUCED_T2=sensor.…
 SENSOR_POWER_CONSUMED=sensor.…
 SENSOR_POWER_PRODUCED=sensor.…
 SENSOR_GAS=sensor.…
+GAS_CORRECTIE=1
 SENSOR_PV_POWER=
 PV_KWP=
 SENSOR_OUTDOOR_TEMP=sensor.…
@@ -190,6 +197,7 @@ Meldingen van het script en wat je dan doet:
 | "Deze regels ontbreken" | de genoemde regels toevoegen, leeg als de sensor er niet is |
 | "Docker draait niet" | Docker Desktop openen en wachten op "Engine running" |
 | Docker Desktop vraagt om WSL of virtualisatie | de aanwijzing van Docker Desktop volgen (soms een Windows-update of herstart) |
+| "GAS_CORRECTIE ontbreekt" | de factor van de jaarnota invullen (stap 2), of `1` |
 | "MQTT_HOST staat aan, maar MQTT_USER is leeg" | de HA-gebruiker uit stap 4b maken en invullen, of MQTT_HOST leeg maken |
 
 Instellingen later aanpassen (bv. MQTT): dezelfde regel in PowerShell nog eens plakken en kiezen voor
@@ -214,7 +222,8 @@ aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
    | Contractkorting | €/jaar | welkomstkorting e.d., anders 0 |
 
    "Geldig vanaf" staat standaard op de eerste dag met meetgegevens; laat dat zo. Een nieuw contract
-   komt later als nieuwe periode.
+   komt later als nieuwe periode. Heeft hij oudere jaarnota's (zeker met historie uit stap 8), voeg die contracten
+   dan toe als eigen periode met hun eigen "geldig vanaf": anders rekent de app vroegere jaren met de prijzen van nu.
 3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
 4. **MQTT** (als het aan staat): bij Beheer → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
@@ -247,9 +256,16 @@ Regels:
   één tarief ontbreekt de helft.
 - **`ts` met tijdzone**. Voor dagcijfers: 12:00 Nederlandse tijd, bv. `2022-01-01T12:00:00+01:00` (zomer `+02:00`);
   dan valt de rij nooit op een andere dag (gas schuift de app 2 uur op).
-- Een **dag met een meterstand in HA gebruikt altijd HA**; de import vult alleen dagen zonder HA-meterdata. Er is
-  geen ondergrens om te verleggen: oudere dagen komen er vanzelf voor.
-- Elk bestand telt één keer (op inhoud); rijen die er al zijn, blijven staan.
+- Een **dag met een stroom- of gasmeterstand in HA gebruikt altijd HA**; de import vult alle andere dagen. Alleen de
+  meterstanden uit stap 2 tellen (afname, teruglevering, gas). Een dag waarop HA alleen temperatuur heeft (bv. een
+  thermostaat die al langer in HA zit) krijgt de historie en houdt die temperatuur. Er is geen ondergrens om te
+  verleggen: oudere dagen komen er vanzelf voor.
+- **0,0 met bron Home Assistant** bij Ruwe data betekent: voor die dag is nog geen historie ingelezen (de dag bestaat
+  door bv. de temperatuur). Het is geen teken dat de import geweigerd wordt; lees die periode gewoon in.
+- **Sluit de periodes aan** tot de eerste dag met een HA-meterstand (`ha_get_history` of de statistiek van de
+  meter-sensoren). Een bestand dat een paar dagen doorloopt in de HA-periode kan geen kwaad: die dagen houden HA.
+- Elk bestand telt één keer (op inhoud). Meer bestanden mag (bv. per jaar); een tijdstip dat er al is, wordt niet
+  overschreven. Een fout in een al ingelezen periode herstel je dus niet met een nieuw bestand.
 
 Voorbeeld:
 ```
@@ -263,7 +279,10 @@ Zet het bestand (naam vrij, `.csv`) in de app; de gebruiker plakt in PowerShell:
 docker cp $env:USERPROFILE\Downloads\historie.csv energie-app:/app/data/import/
 ```
 De app verwerkt het binnen een minuut en rekent de dagcijfers opnieuw uit. Controle: Beheer → **Ruwe data**,
-kolom **bron** = Slimmemeterportal voor die maanden.
+kolom **bron** = Slimmemeterportal voor die maanden, en de totalen per jaar naast de bron van de gebruiker (spreadsheet,
+jaarnota). Blijft er na de import een dag op 0,0 met bron Home Assistant, dan heeft HA die dag wel een meterstand die
+niet oploopt (bv. een P1-meter die bleef hangen); zo'n dag gaat voor op de import. Noteer welke dagen en sensor en laat
+de gebruiker dat aan de beheerder van de app melden.
 
 De pc hoeft niet altijd aan te staan: de app haalt de uurcijfers later alsnog uit HA. Alleen
 minuutdetails ouder dan ~10 dagen (zo lang bewaart HA ze) gaan verloren als de pc lang uit staat.

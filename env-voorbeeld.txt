@@ -16,6 +16,8 @@ SENSOR_POWER_CONSUMED=
 SENSOR_POWER_PRODUCED=
 # Gasmeter (m³, oplopend)
 SENSOR_GAS=
+# Gascorrectie van de leverancier (jaarnota: gecorrigeerd ÷ gemeten verbruik). Onbekend of geen gas: 1. Nooit leeg.
+GAS_CORRECTIE=1
 
 # Zonnepanelen: vermogen nu (W of kW) en het piekvermogen in kWp (aantal panelen × Wp / 1000)
 SENSOR_PV_POWER=
