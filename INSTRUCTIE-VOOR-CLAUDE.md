@@ -235,7 +235,10 @@ aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
    | "weigert gebruiker … klopt niet" | gebruikersnaam of wachtwoord nakijken; de gebruiker moet bestaan en mag niet uitgeschakeld zijn |
    | "geen antwoord van de broker" of "kan niet publiceren naar …" | draait de Mosquitto-add-on? klopt het IP-adres (zonder http en poort)? |
 5. **Maandbedrag** (op Nu): het termijnbedrag en de startdatum van het afrekenjaar, van de jaarnota.
-6. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken. De gegevens blijven bewaard.
+6. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken en op de vraag om de instellingen aan te passen
+   Enter geven. De gegevens blijven bewaard. De app kijkt elke 6 uur of er een nieuwe versie is en toont dan bovenin
+   een melding met deze regel; Beheer → **Versie** laat zien welke versie draait. (Een installatie van vóór
+   16 november 2026 kent die melding nog niet: één keer zo bijwerken, daarna wel.)
 
 ## Stap 8: oudere verbruikshistorie (optioneel)
 
