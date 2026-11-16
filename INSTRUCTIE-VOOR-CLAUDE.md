@@ -13,11 +13,14 @@ gebruiker met één regel in PowerShell.
 
 - Schrijf Nederlands, kort en zonder vakjargon; de gebruiker is geen programmeur. Eén stap tegelijk.
 - **Vraag nooit om het HA-token en laat het nooit in de chat plakken.** De gebruiker zet het zelf in
-  het instellingenbestand. Krijg je het toch, zeg dan dat hij het in HA moet intrekken en een nieuw maken.
+  het instellingenbestand (`.env`). Krijg je het toch, zeg dan dat hij het in HA moet intrekken en een nieuw maken.
   Hetzelfde geldt voor het MQTT-wachtwoord (stap 4b): dat typt hij zelf in Kladblok.
 - Verander niets in HA zonder het eerst te vragen. Alleen lezen mag altijd. Het enige wat je eventueel
   aanmaakt zijn de hulpsensoren (helpers) uit stap 3, na een "ja". Verwijder nooit iets.
 - Gok niet: weet je niet welke sensor het is, laat de gebruiker kiezen uit wat je vond.
+- Het instellingenbestand bevat alleen de verbinding met HA (en eventueel MQTT). Welke sensor bij welke meting hoort,
+  het vermogen van de panelen en de gascorrectie kiest de gebruiker in de app zelf, bij **Beheer** (stap 7). Jij zoekt
+  ze nu op, zodat je hem daar per veld kunt zeggen wat hij kiest.
 
 ## Stap 1: HA bekijken
 
@@ -32,25 +35,31 @@ gebruiker met één regel in PowerShell.
 3. Staat het energiedashboard niet ingesteld: zoek met `ha_search` naar de slimme-meterkoppeling (DSMR,
    HomeWizard P1, SlimmeLezer/ESPHome, P1 Monitor) en neem daar de sensoren van.
 
-## Stap 2: de sensoren kiezen
+## Stap 2: de sensoren opzoeken
 
-De app wil precies deze, als entity-id. Lees van elke kandidaat de state en attributen (`ha_get_state`).
+De app wil deze metingen. Lees van elke kandidaat de state en attributen (`ha_get_state`). Noteer per meting de
+**naam** (friendly_name) én de entity-id: in de app kiest de gebruiker uit een keuzelijst met "naam · entity-id ·
+stand", en die lijst toont alleen sensoren met de juiste eenheid.
 
-| Instelling | Wat | Eisen |
+| In de app (Beheer → Sensoren) | Wat | Eisen |
 |---|---|---|
-| `SENSOR_ENERGY_CONSUMED_T1` / `_T2` | meterstand afname dal / normaal | kWh, `state_class` total_increasing |
-| `SENSOR_ENERGY_PRODUCED_T1` / `_T2` | meterstand teruglevering dal / normaal | kWh, total_increasing; geen panelen → leeg |
-| `SENSOR_POWER_CONSUMED` / `_PRODUCED` | vermogen nu, afname en teruglevering apart | W of kW, `state_class` measurement, allebei ≥ 0 |
-| `SENSOR_GAS` | meterstand gas | m³, total_increasing; geen gas → leeg |
-| `SENSOR_PV_POWER` | vermogen van de panelen nu | W of kW, measurement; geen panelen → leeg |
-| `PV_KWP` | piekvermogen van de panelen | getal in kWp: vraag aantal panelen × wattpiek ÷ 1000 |
-| `SENSOR_OUTDOOR_TEMP` | buitentemperatuur | °C, measurement |
-| `SENSOR_INDOOR_TEMP` | binnentemperatuur (woonkamer/thermostaat) | °C, measurement |
-| `GAS_CORRECTIE` | factor waarmee de leverancier de gemeten m³ omrekent | getal, zie hieronder; **nooit leeg** |
-| `SENSOR_INDOOR_TEMP_OUD` | een oudere binnensensor die vroegere jaren vult | meestal leeg |
-| `SENSOR_BATTERY_ENERGY_IN` | thuisaccu: energie erin (laden) | kWh, total_increasing; geen accu → leeg |
-| `SENSOR_BATTERY_ENERGY_OUT` | thuisaccu: energie eruit (ontladen) | kWh, total_increasing |
-| `SENSOR_BATTERY_SOC` | thuisaccu: laadtoestand | %, measurement |
+| Stroom dal (T1) / Stroom normaal (T2) | meterstand afname dal / normaal | kWh, `state_class` total_increasing |
+| Teruglevering dal (T1) / normaal (T2) | meterstand teruglevering dal / normaal | kWh, total_increasing; geen panelen → geen |
+| Gas meterstand | meterstand gas | m³, total_increasing; geen gas → geen |
+| Netafname vermogen / Teruglevering vermogen | vermogen nu, afname en teruglevering apart | W of kW, `state_class` measurement, allebei ≥ 0 |
+| Zonnepanelen vermogen | vermogen van de panelen nu | W of kW, measurement; geen panelen → geen |
+| Buitentemperatuur | buitentemperatuur | °C, measurement |
+| Binnentemperatuur | binnentemperatuur (woonkamer/thermostaat) | °C, measurement |
+| Binnentemperatuur (oude sensor) | een oudere binnensensor die vroegere jaren vult | meestal geen |
+| Thuisaccu geladen / ontladen | thuisaccu: energie erin / eruit | kWh, total_increasing; geen accu → geen |
+| Thuisaccu laadtoestand | thuisaccu: laadtoestand | %, measurement |
+
+En bij **Beheer → Instellingen**:
+
+| In de app | Wat |
+|---|---|
+| Zonnepanelen (kWp) | piekvermogen: vraag aantal panelen × wattpiek ÷ 1000; geen panelen → leeg |
+| Gascorrectie | factor waarmee de leverancier de gemeten m³ omrekent, zie hieronder |
 
 Waar je ze vindt:
 - **Vermogen afname/teruglevering**: op hetzelfde apparaat als de meterstanden (`ha_get_device`), bv.
@@ -64,16 +73,16 @@ Waar je ze vindt:
 - **Binnen**: een temperatuursensor in de woonkamer, of de `current_temperature` van de thermostaat
   (`climate.*`; dan een helper).
 - **Thuisaccu** (bv. HomeWizard Plug-In Battery, model HWE-BAT): op het apparaat van de accu de tellers
-  "Energie import" (= laden) en "Energie export" (= ontladen) en "Laadtoestand". Meer accu's: per instelling de
-  entity-id's met komma's ertussen, steeds in dezelfde volgorde. Staat de accu in het energiedashboard (type `battery`),
+  "Energie import" (= laden) en "Energie export" (= ontladen) en "Laadtoestand". Meer accu's: in de app met
+  **nog een accu** een tweede keuzelijst erbij, bij geladen, ontladen en laadtoestand steeds in dezelfde volgorde. Staat de accu in het energiedashboard (type `battery`),
   dan zijn `stat_energy_to` (laden) en `stat_energy_from` (ontladen) dezelfde tellers. Andere merken (Marstek,
   Anker Solix, …) werken net zo, als er kWh-tellers zijn. Heeft de integratie alleen een vermogen (W), maak dan in
   stap 3 de tellers met een helper.
 
 **Gascorrectie**: de leverancier rekent niet met de m³ van de meter, maar met een gecorrigeerd volume. De factor
 staat op de jaarnota bij gas ("correctiefactor", of gecorrigeerd verbruik ÷ gemeten verbruik, bv. 1.022). Vraag om
-de jaarnota en reken hem uit; vind je hem niet, of geen gas: `1`. Laat de regel nooit leeg: dan rekent de app met de
-factor van een ander huishouden.
+de jaarnota en reken hem uit; vind je hem niet, of geen gas: `1`. Laat hem in de app niet op de beginwaarde 1,022 staan:
+dat is de factor van een ander huishouden.
 
 Een sensor moet al langer bestaan om de geschiedenis te hebben: de app haalt de uurstatistiek van HA op,
 jaren terug. Een nieuwe helper begint vandaag. Zeg dat erbij.
@@ -139,29 +148,12 @@ Wil hij het:
 
 ## Stap 5: het instellingenbestand
 
-Geef de gebruiker het hele bestand in één codeblok, met **alle** regels hieronder; een sensor die er
-niet is krijgt niets achter de `=` (laat zo'n regel nooit weg: dan vult de app de sensornaam van een
-ander huishouden in). Het token blijft leeg.
+Geef de gebruiker het hele bestand in één codeblok. Het bevat alleen de verbinding; het token blijft leeg. Zonder
+MQTT blijven de drie MQTT-regels leeg.
 
 ```
 HA_URL=http://192.168.1.20:8123
 HA_TOKEN=
-SENSOR_ENERGY_CONSUMED_T1=sensor.…
-SENSOR_ENERGY_CONSUMED_T2=sensor.…
-SENSOR_ENERGY_PRODUCED_T1=sensor.…
-SENSOR_ENERGY_PRODUCED_T2=sensor.…
-SENSOR_POWER_CONSUMED=sensor.…
-SENSOR_POWER_PRODUCED=sensor.…
-SENSOR_GAS=sensor.…
-GAS_CORRECTIE=1
-SENSOR_PV_POWER=
-PV_KWP=
-SENSOR_OUTDOOR_TEMP=sensor.…
-SENSOR_INDOOR_TEMP=sensor.…
-SENSOR_INDOOR_TEMP_OUD=
-SENSOR_BATTERY_ENERGY_IN=sensor.…
-SENSOR_BATTERY_ENERGY_OUT=sensor.…
-SENSOR_BATTERY_SOC=sensor.…
 MQTT_HOST=
 MQTT_USER=
 MQTT_PASSWORD=
@@ -194,10 +186,8 @@ Meldingen van het script en wat je dan doet:
 |---|---|
 | "weigert het token (401)" | nieuw token maken, regel opnieuw plakken, kiezen voor aanpassen |
 | "niet bereikbaar vanaf deze pc" | HA_URL controleren (IP, poort 8123, http of https) |
-| "Deze regels ontbreken" | de genoemde regels toevoegen, leeg als de sensor er niet is |
 | "Docker draait niet" | Docker Desktop openen en wachten op "Engine running" |
 | Docker Desktop vraagt om WSL of virtualisatie | de aanwijzing van Docker Desktop volgen (soms een Windows-update of herstart) |
-| "GAS_CORRECTIE ontbreekt" | de factor van de jaarnota invullen (stap 2), of `1` |
 | "MQTT_HOST staat aan, maar MQTT_USER is leeg" | de HA-gebruiker uit stap 4b maken en invullen, of MQTT_HOST leeg maken |
 
 Instellingen later aanpassen (bv. MQTT): dezelfde regel in PowerShell nog eens plakken en kiezen voor
@@ -205,9 +195,17 @@ aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
 
 ## Stap 7: na de installatie
 
-1. **Beheer** (bovenaan): onder Sensoren moet elke sensor uurwaarden hebben. De eerste keer haalt de
-   app jaren aan statistiek op; dat duurt een paar minuten.
-2. **Tarieven**: Nu vraagt eerst om de tarieven van het huidige contract, bij Beheer. Vraag de gebruiker
+Beheer (rechtsboven, of onderaan op een telefoon) heeft vijf onderdelen: Status, Tarieven, Instellingen, Sensoren en
+Data. Loop ze met de gebruiker door, in deze volgorde:
+
+1. **Beheer → Sensoren**: per meting de sensor uit stap 2 kiezen in de keuzelijst; een meting die hij niet heeft op
+   **— geen —**. Staat er al iets met "(niet in HA)" achter, dan is dat een beginwaarde van een ander huishouden:
+   kies de goede sensor of **— geen —**. Daarna **Bewaren**. De app verbindt dan opnieuw met HA en haalt jaren aan
+   uurstatistiek op; dat duurt een paar minuten. Onder elke sensor staat daarna tot wanneer er uurwaarden en minuten
+   zijn. Lukt de keuzelijst niet (HA even onbereikbaar), dan zijn het tekstvakken: typ dan de entity-id.
+   **Beheer → Instellingen**: zonnepanelen (kWp) en gascorrectie uit stap 2, **Bewaren**. "Goedkope uren per nacht"
+   mag op 4 blijven (alleen van belang bij een dynamisch contract).
+2. **Tarieven**: Nu vraagt eerst om de tarieven van het huidige contract, bij Beheer → Tarieven. Vraag de gebruiker
    om een foto of schermafbeelding van zijn jaarnota of contractbevestiging en vertel per veld wat hij
    invult:
 
@@ -229,7 +227,7 @@ aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
    eerste periode (Bekijken) de tarieven van het contract dat gold op de eerste dag met meetgegevens.
 3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
-4. **MQTT** (als het aan staat): bij Beheer → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
+4. **MQTT** (als het aan staat): bij Beheer → Status → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
    wat HA nu heeft**: alle berichten gelijk. In HA verschijnt het apparaat "Energiecontract". Meldingen:
 
    | Melding | Oplossing |
@@ -240,8 +238,10 @@ aanpassen. Het script start de app daarna opnieuw met de nieuwe instellingen.
 5. **Maandbedrag** (op Nu): het termijnbedrag en de startdatum van het afrekenjaar, van de jaarnota.
 6. **Bijwerken**: dezelfde regel in PowerShell nog eens plakken en op de vraag om de instellingen aan te passen
    Enter geven. De gegevens blijven bewaard. De app kijkt elke 6 uur of er een nieuwe versie is en toont dan bovenin
-   een melding met deze regel; Beheer → **Versie** laat zien welke versie draait. (Een installatie van vóór
+   een melding met deze regel; Beheer → Status → **Versie** laat zien welke versie draait. (Een installatie van vóór
    16 november 2026 kent die melding nog niet: één keer zo bijwerken, daarna wel.)
+   Een oudere installatie heeft de sensoren, `PV_KWP` en `GAS_CORRECTIE` nog in `.env`. Dat blijft werken: Beheer toont
+   die waarden. Wijzigen gaat voortaan in Beheer (dat gaat voor `.env`); de oude regels mogen blijven staan.
 
 ## Stap 8: oudere verbruikshistorie (optioneel)
 
@@ -263,10 +263,10 @@ Regels:
 - **`ts` met tijdzone**. Voor dagcijfers: 12:00 Nederlandse tijd, bv. `2022-01-01T12:00:00+01:00` (zomer `+02:00`);
   dan valt de rij nooit op een andere dag (gas schuift de app 2 uur op).
 - Een **dag met een stroom- of gasmeterstand in HA gebruikt altijd HA**; de import vult alle andere dagen. Alleen de
-  meterstanden uit stap 2 tellen (afname, teruglevering, gas). Een dag waarop HA alleen temperatuur heeft (bv. een
+  meterstanden uit stap 2 (Beheer → Sensoren) tellen (afname, teruglevering, gas). Een dag waarop HA alleen temperatuur heeft (bv. een
   thermostaat die al langer in HA zit) krijgt de historie en houdt die temperatuur. Er is geen ondergrens om te
   verleggen: oudere dagen komen er vanzelf voor.
-- **0,0 met bron Home Assistant** bij Ruwe data betekent: voor die dag is nog geen historie ingelezen (de dag bestaat
+- **0,0 met bron Home Assistant** bij Beheer → Data betekent: voor die dag is nog geen historie ingelezen (de dag bestaat
   door bv. de temperatuur). Het is geen teken dat de import geweigerd wordt; lees die periode gewoon in.
 - **Sluit de periodes aan** tot de eerste dag met een HA-meterstand (`ha_get_history` of de statistiek van de
   meter-sensoren). Een bestand dat een paar dagen doorloopt in de HA-periode kan geen kwaad: die dagen houden HA.
@@ -284,7 +284,7 @@ Zet het bestand (naam vrij, `.csv`) in de app; de gebruiker plakt in PowerShell:
 ```
 docker cp $env:USERPROFILE\Downloads\historie.csv energie-app:/app/data/import/
 ```
-De app verwerkt het binnen een minuut en rekent de dagcijfers opnieuw uit. Controle: Beheer → **Ruwe data**,
+De app verwerkt het binnen een minuut en rekent de dagcijfers opnieuw uit. Controle: Beheer → **Data**,
 kolom **bron** = Slimmemeterportal voor die maanden, en de totalen per jaar naast de bron van de gebruiker (spreadsheet,
 jaarnota). Blijft er na de import een dag op 0,0 met bron Home Assistant, dan heeft HA die dag wel een meterstand die
 niet oploopt (bv. een P1-meter die bleef hangen); zo'n dag gaat voor op de import. Noteer welke dagen en sensor en laat

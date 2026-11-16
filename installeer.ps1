@@ -92,22 +92,10 @@ function Install-EnergieApp {
         Fout 'HA_URL of HA_TOKEN is leeg. Voer dit opnieuw uit en vul ze in.'
         return
     }
-    $ontbreekt = @('SENSOR_ENERGY_CONSUMED_T1','SENSOR_ENERGY_CONSUMED_T2','SENSOR_GAS','SENSOR_PV_POWER','SENSOR_OUTDOOR_TEMP','SENSOR_INDOOR_TEMP') |
-        Where-Object { -not $waarden.ContainsKey($_) }
-    if ($ontbreekt) {
-        # Een regel die helemaal ontbreekt valt terug op de sensornamen van een ander huishouden.
-        Fout ("Deze regels ontbreken in de instellingen: " + ($ontbreekt -join ', ') + ". Zet ze erin (leeg achter de = als je de sensor niet hebt).")
-        return
-    }
     if ($waarden['MQTT_HOST'] -and -not $waarden['MQTT_USER']) {
         # Mosquitto in HA laat niemand toe zonder login; zonder gebruiker mislukt elk bericht.
         Write-Host 'Let op: MQTT_HOST staat aan, maar MQTT_USER is leeg. Mosquitto in Home Assistant wil een login;' -ForegroundColor Yellow
         Write-Host '        vul MQTT_USER en MQTT_PASSWORD in (een HA-gebruiker), of maak MQTT_HOST leeg.' -ForegroundColor Yellow
-    }
-    if ($waarden['SENSOR_GAS'] -and -not $waarden['GAS_CORRECTIE']) {
-        # Zonder waarde rekent de app met 1,022: de gascorrectie van een ander huishouden.
-        Write-Host 'Let op: GAS_CORRECTIE ontbreekt. De app rekent dan met 1,022 (de factor van een ander huis).' -ForegroundColor Yellow
-        Write-Host '        Zet GAS_CORRECTIE= met de factor van je jaarnota erin, of 1 als je die niet weet.' -ForegroundColor Yellow
     }
     try {
         $antwoord = Invoke-RestMethod -Uri "$url/api/" -Headers @{ Authorization = "Bearer $token" } -TimeoutSec 15 -ErrorAction Stop
@@ -151,7 +139,8 @@ function Install-EnergieApp {
     Stap 'Klaar'
     Write-Host 'De app draait op http://localhost:8000 (ook na een herstart, zolang Docker Desktop meestart).' -ForegroundColor Green
     Write-Host 'De eerste keer haalt hij jaren aan meterstanden uit Home Assistant; dat duurt een paar minuten.'
-    Write-Host 'Vul daarna bij Beheer de tarieven van je contract in. Bijwerken: voer dezelfde regel opnieuw uit.'
+    Write-Host 'Kies daarna bij Beheer > Sensoren je sensoren, vul bij Beheer > Instellingen je panelen en gascorrectie in,'
+    Write-Host 'en bij Beheer > Tarieven je contract. Bijwerken: voer dezelfde regel opnieuw uit.'
     Start-Process 'http://localhost:8000'
 }
 
