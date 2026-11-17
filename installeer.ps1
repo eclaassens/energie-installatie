@@ -73,6 +73,7 @@ function Install-EnergieApp {
         Write-Host ' - vervang alles door de regels die Claude je gaf (of vul ze in);'
         Write-Host ' - plak je Home Assistant-token achter HA_TOKEN= (en nergens anders);'
         Write-Host ' - tarieven naar HA (MQTT)? typ dan het wachtwoord van de HA-gebruiker achter MQTT_PASSWORD=;'
+        Write-Host ' - dynamisch contract met een enever-token? typ dat dan achter ENEVER_TOKEN=;'
         Write-Host ' - sla op (Ctrl+S) en sluit Kladblok. Daarna gaat de installatie verder.'
         Start-Process notepad.exe -ArgumentList "`"$env_pad`"" -Wait
     }

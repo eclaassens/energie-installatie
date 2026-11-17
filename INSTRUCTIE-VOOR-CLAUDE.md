@@ -163,6 +163,11 @@ MQTT_USER=
 MQTT_PASSWORD=
 ```
 
+Heeft hij een **dynamisch contract** en wil hij de werkelijke prijzen van zijn leverancier (stap 7, Tarieven), dan
+komt er een regel `ENEVER_TOKEN=` bij. Dat token maakt hij zelf, gratis, op https://enever.nl/token-aanmaken/ (alleen
+voor persoonlijk gebruik; de app blijft ruim onder de 250 verzoeken per maand). Ook dat typt hij zelf in Kladblok,
+nooit in de chat. Geen dynamisch contract of twijfel: weglaten, het kan later altijd nog.
+
 Leg dan uit hoe hij een token maakt: in HA linksonder op zijn naam (profiel) → tabblad **Beveiliging**
 → onderaan **Langlevende toegangstokens** → **Token aanmaken**, naam "energie-app" → kopiëren. Het
 token is maar één keer te zien; hij plakt het straks in Kladblok achter `HA_TOKEN=`. Met MQTT typt hij daar ook
@@ -229,6 +234,16 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    jaren anders met de prijzen van nu. Voeg dan elk contract, ook het huidige, toe als nieuwe periode met zijn eigen
    startdatum; de volgorde maakt niet uit (de periode waarin die datum valt, loopt tot de dag ervoor). Zet daarna in de
    eerste periode (Bekijken) de tarieven van het contract dat gold op de eerste dag met meetgegevens.
+
+   **Dynamisch contract** (prijs per uur): kies in het venster **Dynamisch**. Dan vult hij geen prijzen per kWh en m³
+   in, maar de **opslag** van de leverancier op de marktprijs (stroom, gas) en de **inhouding** op teruglevering (vaak
+   0). Vaste kosten, netbeheer en de vermindering energiebelasting blijven zoals in de tabel. Wil hij de prijzen die
+   zijn leverancier werkelijk rekent (inclusief afronding en belasting), kies dan bij **Prijzen van de leverancier
+   (enever.nl)** zijn leverancier. Dat werkt alleen met een eigen, gratis token van enever.nl (zie stap 5);
+   zonder token rekent de app gewoon met markt + opslag. Achter sommige namen staat "(alleen stroom)" of
+   "(alleen gas)": enever heeft voor die leverancier maar één van de twee prijzen, en de andere rekent de app met
+   markt + opslag. Vul de opslagen dus altijd in. Teruglevering is altijd markt − inhouding (daar heeft enever geen
+   prijs voor). De app werkt met prijzen per uur; rekent de leverancier per kwartier, dan is dat een benadering.
 3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
 4. **MQTT** (als het aan staat): bij Beheer → Status → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met

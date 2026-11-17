@@ -13,3 +13,8 @@ HA_TOKEN=
 MQTT_HOST=
 MQTT_USER=
 MQTT_PASSWORD=
+
+# Alleen bij een dynamisch contract (mag leeg blijven): de prijzen die je leverancier per uur rekent, van enever.nl.
+# Een gratis token voor persoonlijk gebruik maak je op https://enever.nl/token-aanmaken/. Zelf hier intypen, nooit in een chat.
+# Daarna in de app bij Beheer > Tarieven, bij je dynamische periode, je leverancier kiezen.
+ENEVER_TOKEN=
