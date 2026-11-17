@@ -199,8 +199,9 @@ Beheer (rechtsboven, of onderaan op een telefoon) heeft vijf onderdelen: Status,
 Data. Loop ze met de gebruiker door, in deze volgorde:
 
 1. **Beheer → Sensoren**: per meting de sensor uit stap 2 kiezen in de keuzelijst; een meting die hij niet heeft op
-   **— geen —**. Staat er al iets met "(niet in HA)" achter, dan is dat een beginwaarde van een ander huishouden:
-   kies de goede sensor of **— geen —**. Daarna **Bewaren**. De app verbindt dan opnieuw met HA en haalt jaren aan
+   **— geen —**. Bij een nieuwe installatie staat alles nog op **— geen —**; tot er sensoren gekozen zijn, meet de
+   app niets. Staat er bij een oudere installatie iets met "(niet in HA)" achter, dan bestaat die sensor niet in
+   deze HA: kies de goede of **— geen —**. Daarna **Bewaren**. De app verbindt dan opnieuw met HA en haalt jaren aan
    uurstatistiek op; dat duurt een paar minuten. Onder elke sensor staat daarna tot wanneer er uurwaarden en minuten
    zijn. Lukt de keuzelijst niet (HA even onbereikbaar), dan zijn het tekstvakken: typ dan de entity-id.
    **Beheer → Instellingen**: zonnepanelen (kWp) en gascorrectie uit stap 2, **Bewaren**. "Goedkope uren per nacht"
