@@ -132,10 +132,12 @@ thuisnetwerk met poort, bv. `http://192.168.1.20:8123` (`ha_get_overview` → ba
 adres dat de gebruiker in zijn browser gebruikt). Niet `homeassistant.local`: Docker kan dat vaak niet
 vinden. Een https-adres van buitenaf (Nabu Casa, DuckDNS) werkt ook.
 
-## Stap 4b: tarieven naar HA via MQTT (optioneel)
+## Stap 4b: tarieven en prijzen naar HA via MQTT (optioneel)
 
 Met MQTT zet de app de tarieven van het contract en de sync-status als sensoren in HA (apparaat
-"Energiecontract", `sensor.energiecontract_*`), bv. voor de kosten in het energiedashboard. Zonder MQTT werkt
+"Energiecontract", `sensor.energiecontract_*`), bv. voor de kosten in het energiedashboard. Ook de prijs per uur
+met het eigen contract, vandaag en morgen: `sensor.energiecontract_stroomprijs` en `_terugleverprijs`. Daarmee kan
+HA zelf kiezen wanneer de auto of een thuisaccu laadt (zie stap 7). Zonder MQTT werkt
 de app ook; vraag of hij dit wil. Nee of twijfel: `MQTT_HOST`, `MQTT_USER` en `MQTT_PASSWORD` blijven leeg.
 
 Wil hij het:
@@ -207,7 +209,8 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    uurstatistiek op; dat duurt een paar minuten. Onder elke sensor staat daarna tot wanneer er uurwaarden en minuten
    zijn. Lukt de keuzelijst niet (HA even onbereikbaar), dan zijn het tekstvakken: typ dan de entity-id.
    **Beheer → Instellingen**: zonnepanelen (kWp) en gascorrectie uit stap 2, **Bewaren**. "Goedkope uren per nacht"
-   mag op 4 blijven (alleen van belang bij een dynamisch contract).
+   mag op 4 blijven: die hoort bij de oude goedkoop-uur-sensor (zie punt 4) en doet alleen iets bij een dynamisch
+   contract.
 2. **Tarieven**: Nu vraagt eerst om de tarieven van het huidige contract, bij Beheer → Tarieven. Vraag de gebruiker
    om een foto of schermafbeelding van zijn jaarnota of contractbevestiging en vertel per veld wat hij
    invult:
@@ -231,7 +234,20 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
 3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
 4. **MQTT** (als het aan staat): bij Beheer → Status → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
-   wat HA nu heeft**: alle berichten gelijk. In HA verschijnt het apparaat "Energiecontract". Meldingen:
+   wat HA nu heeft**: alle berichten gelijk. In HA verschijnt het apparaat "Energiecontract".
+
+   **Laden op goedkope uren** (auto, thuisaccu): die keuze maakt HA zelf, de app levert de prijzen.
+   `sensor.energiecontract_stroomprijs` is de prijs van dit uur met het contract van de gebruiker: bij een vast
+   contract dal of normaal volgens de meter, bij een dynamisch contract de day-ahead + opslag + energiebelasting.
+   `sensor.energiecontract_terugleverprijs` is wat een teruggeleverde kWh oplevert, zonder saldering (die stopt op
+   1-1-2027). In de attributen staan alle uren van vandaag en morgen (morgen vanaf ongeveer 13:00) in dezelfde vorm
+   als de Nordpool-integratie: `today`, `tomorrow`, `raw_today`/`raw_tomorrow` met `start`, `end` en `value`, en
+   `tomorrow_valid`. De macro *cheapest energy hours* (HACS) en de meeste prijsgrafieken lezen dat zonder
+   omrekenen. Bouw zo'n automatisering alleen als de gebruiker erom vraagt, en na een "ja" op het voorstel. De
+   oudere `binary_sensor.energiecontract_goedkoop_uur` (de goedkoopste uren van de nacht) bestaat nog, maar verdwijnt;
+   gebruik hem niet voor iets nieuws.
+
+   Meldingen:
 
    | Melding | Oplossing |
    |---|---|
