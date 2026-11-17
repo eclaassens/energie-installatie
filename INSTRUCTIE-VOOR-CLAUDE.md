@@ -50,7 +50,6 @@ stand", en die lijst toont alleen sensoren met de juiste eenheid.
 | Zonnepanelen vermogen | vermogen van de panelen nu | W of kW, measurement; geen panelen → geen |
 | Buitentemperatuur | buitentemperatuur | °C, measurement |
 | Binnentemperatuur | binnentemperatuur (woonkamer/thermostaat) | °C, measurement |
-| Binnentemperatuur (oude sensor) | een oudere binnensensor die vroegere jaren vult | meestal geen |
 | Thuisaccu geladen / ontladen | thuisaccu: energie erin / eruit | kWh, total_increasing; geen accu → geen |
 | Thuisaccu laadtoestand | thuisaccu: laadtoestand | %, measurement |
 
@@ -67,9 +66,11 @@ Waar je ze vindt:
   teruglevering (bv. HomeWizard "Actief vermogen"), maak dan in stap 3 twee hulpsensoren.
 - **Panelen**: op het apparaat van de `solar`-sensor uit het energiedashboard (omvormer, bv. Enphase
   "current power production", SolarEdge "current power"). Alleen een kWh-teller? Dan in stap 3 een helper.
-- **Buiten**: een echte buitensensor (weerstation, thermostaat met buitentemperatuur) gaat voor.
-  Anders de weerdienst (`weather.*`, bv. `weather.forecast_home`): die heeft de temperatuur alleen als
-  attribuut, dus dan in stap 3 een helper.
+- **Buiten**: een echte buitensensor (eigen weerstation) gaat voor. Anders een weerdienst die een
+  temperatuursensor heeft, bv. Buienradar (`sensor.buienradar_temperature`, het dichtstbijzijnde KNMI-station).
+  Alleen `weather.*` (bv. `weather.forecast_home`)? Die heeft de temperatuur alleen als attribuut, dus dan in stap 3
+  een helper. Liever niet: de buitentemperatuur van een thermostaat via een cloudkoppeling (die kan verdwijnen, zoals
+  de Honeywell Lyric in november 2026) of het buitendeel van een airco (hele graden, en warmer als hij draait).
 - **Binnen**: een temperatuursensor in de woonkamer, of de `current_temperature` van de thermostaat
   (`climate.*`; dan een helper).
 - **Thuisaccu** (bv. HomeWizard Plug-In Battery, model HWE-BAT): op het apparaat van de accu de tellers
@@ -85,7 +86,8 @@ de jaarnota en reken hem uit; vind je hem niet, of geen gas: `1`. Laat hem in de
 dat is de factor van een ander huishouden.
 
 Een sensor moet al langer bestaan om de geschiedenis te hebben: de app haalt de uurstatistiek van HA op,
-jaren terug. Een nieuwe helper begint vandaag. Zeg dat erbij.
+jaren terug. Een nieuwe helper begint vandaag. Zeg dat erbij. (Vervang je later in Beheer een sensor door een andere,
+dan gaat de geschiedenis van de oude mee; zie stap 7, "Een sensor vervangen".)
 
 ## Stap 3: hulpsensoren (alleen als het nodig is, na een "ja")
 
@@ -243,6 +245,12 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    16 november 2026 kent die melding nog niet: één keer zo bijwerken, daarna wel.)
    Een oudere installatie heeft de sensoren, `PV_KWP` en `GAS_CORRECTIE` nog in `.env`. Dat blijft werken: Beheer toont
    die waarden. Wijzigen gaat voortaan in Beheer (dat gaat voor `.env`); de oude regels mogen blijven staan.
+7. **Een sensor vervangen**: verdwijnt een gekozen sensor uit HA (integratie weg, hernoemd), dan meldt de app dat na
+   de volgende sync: de stip bovenin wordt oranje ("Niet meer in Home Assistant: …"), Beheer → Status heeft een kaart
+   met een link, en bij Beheer → Sensoren staat het onder die sensor. Zoek dan met de gebruiker een opvolger (stap 2)
+   en kies die bij Sensoren. De nieuwe sensor krijgt de geschiedenis van de oude van vóór zijn eigen begin; de
+   dagcijfers worden daarna opnieuw berekend. Hetzelfde bij een nieuwe P1-koppeling of slimme meter. Bij de thuisaccu
+   gaat er niets mee: een andere sensor is daar een andere accu.
 
 ## Stap 8: oudere verbruikshistorie (optioneel)
 
