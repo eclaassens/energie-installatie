@@ -208,9 +208,7 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    deze HA: kies de goede of **— geen —**. Daarna **Bewaren**. De app verbindt dan opnieuw met HA en haalt jaren aan
    uurstatistiek op; dat duurt een paar minuten. Onder elke sensor staat daarna tot wanneer er uurwaarden en minuten
    zijn. Lukt de keuzelijst niet (HA even onbereikbaar), dan zijn het tekstvakken: typ dan de entity-id.
-   **Beheer → Instellingen**: zonnepanelen (kWp) en gascorrectie uit stap 2, **Bewaren**. "Goedkope uren per nacht"
-   mag op 4 blijven: die hoort bij de oude goedkoop-uur-sensor (zie punt 4) en doet alleen iets bij een dynamisch
-   contract.
+   **Beheer → Instellingen**: zonnepanelen (kWp) en gascorrectie uit stap 2, **Bewaren**.
 2. **Tarieven**: Nu vraagt eerst om de tarieven van het huidige contract, bij Beheer → Tarieven. Vraag de gebruiker
    om een foto of schermafbeelding van zijn jaarnota of contractbevestiging en vertel per veld wat hij
    invult:
@@ -243,9 +241,11 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    1-1-2027). In de attributen staan alle uren van vandaag en morgen (morgen vanaf ongeveer 13:00) in dezelfde vorm
    als de Nordpool-integratie: `today`, `tomorrow`, `raw_today`/`raw_tomorrow` met `start`, `end` en `value`, en
    `tomorrow_valid`. De macro *cheapest energy hours* (HACS) en de meeste prijsgrafieken lezen dat zonder
-   omrekenen. Bouw zo'n automatisering alleen als de gebruiker erom vraagt, en na een "ja" op het voorstel. De
-   oudere `binary_sensor.energiecontract_goedkoop_uur` (de goedkoopste uren van de nacht) bestaat nog, maar verdwijnt;
-   gebruik hem niet voor iets nieuws.
+   omrekenen. Bouw zo'n automatisering alleen als de gebruiker erom vraagt, en na een "ja" op het voorstel. Een
+   voorbeeld voor de auto: een template-binary-sensor die aan staat als dit uur bij de N goedkoopste uren van
+   `raw_today` hoort (gelijke prijzen tellen allemaal mee, dus bij een vast contract precies de daluren). De vroegere
+   `binary_sensor.energiecontract_goedkoop_uur` bestaat sinds 17-11-2026 niet meer; de app haalt hem bij het
+   opstarten uit HA. Gebruikt een automatisering hem nog, zet die dan om naar zo'n eigen sensor.
 
    Meldingen:
 
