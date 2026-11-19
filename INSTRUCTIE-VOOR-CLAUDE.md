@@ -235,6 +235,12 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    startdatum; de volgorde maakt niet uit (de periode waarin die datum valt, loopt tot de dag ervoor). Zet daarna in de
    eerste periode (Bekijken) de tarieven van het contract dat gold op de eerste dag met meetgegevens.
 
+   **Aangekondigde prijswijziging** (mail of brief van de leverancier met nieuwe tarieven vanaf een datum): voeg
+   die meteen toe als nieuwe periode met die datum als "Geldig vanaf", ook als die datum nog moet komen. Tot die dag
+   rekent de app, en krijgt HA via MQTT, gewoon het tarief van vandaag; bij Contract staat dan "jij: … , vanaf
+   <datum> …". Alleen de vooruitblik (blijven zitten volgend jaar) rekent al met de nieuwe prijzen. Staan er twee
+   wijzigingen in één mail (bv. per 1 december en per 1 januari), voeg dan beide toe.
+
    **Dynamisch contract** (prijs per uur): kies in het venster **Dynamisch**. Dan vult hij geen prijzen per kWh en m³
    in, maar de **opslag** van de leverancier op de marktprijs (stroom, gas) en de **inhouding** op teruglevering (vaak
    0). Vaste kosten, netbeheer en de vermindering energiebelasting blijven zoals in de tabel. Wil hij de prijzen die
