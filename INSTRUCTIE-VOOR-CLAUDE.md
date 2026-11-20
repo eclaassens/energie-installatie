@@ -252,6 +252,11 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    prijs voor). De app werkt met prijzen per uur; rekent de leverancier per kwartier, dan is dat een benadering.
 3. **Thuisaccu**: met de accusensoren staat bij Verbruik een tabblad **Accu**: geladen, ontladen, rendement,
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
+   Bij Verbruik → Stroom laat **Eigen verbruik** zien wat het huis gebruikte: van het net, rechtstreeks van de zon
+   en (met accusensoren) uit de accu.
+   Overweegt hij een accu op een dynamisch contract: bij Accu → Dynamisch kiest hij bij **Marktprijzen** tussen de
+   prijzen van het afgelopen jaar en het niveau van de laatste 30 dagen. Na een periode met hoge prijzen lopen die ver
+   uiteen; noem beide en zeg op welk niveau een bedrag staat.
 4. **MQTT** (als het aan staat): bij Beheer → Status → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
    wat HA nu heeft**: alle berichten gelijk. In HA verschijnt het apparaat "Energiecontract".
 
