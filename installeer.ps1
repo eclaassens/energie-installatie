@@ -61,6 +61,14 @@ function Install-EnergieApp {
         Fout "Downloaden mislukt: $($_.Exception.Message)"
         return
     }
+    # De Claude-skill om een aanbod van gaslicht.com in de app te zetten (Claude Code / de Code-tab). Niet erg als het mislukt.
+    try {
+        $skill = Join-Path $env:USERPROFILE '.claude\skills\energie-aanbod'
+        New-Item -ItemType Directory -Force -Path $skill -ErrorAction Stop | Out-Null
+        Invoke-WebRequest -UseBasicParsing "$bron/skills/energie-aanbod/SKILL.md" -OutFile (Join-Path $skill 'SKILL.md') -ErrorAction Stop
+    } catch {
+        Write-Host "De Claude-skill voor aanbiedingen kon niet worden neergezet: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
     $invullen = $true
     if (Test-Path $env_pad) {
         $invullen = (Read-Host 'Er zijn al instellingen. Wil je ze aanpassen? (j/N)') -eq 'j'

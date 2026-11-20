@@ -40,10 +40,16 @@ zelf:
 **Bijwerken** naar een nieuwe versie: plak dezelfde regel nog eens in PowerShell. Daarmee pas je ook de
 verbinding aan (kies "j" bij de vraag om ze aan te passen); sensoren en instellingen wijzig je in de app.
 
+**Een aanbod vergelijken**: gebruik je Claude Code of de Code-tab van de Claude-app, stuur Claude dan een screenshot
+van een aanbod op gaslicht.com (klap eerst **Prijsdetails** open), of log in de ingebouwde browser zelf in op
+gaslicht.com en vraag "haal het aanbod van vandaag op". Claude zet het in de app en zegt wat overstappen per jaar
+scheelt. Een aanbod is één dag geldig.
+
 ## Wat er op je pc komt
 
 - Docker Desktop (als het er nog niet is).
 - De map `energie-app` in je gebruikersmap, met `docker-compose.yml` en `.env` (de verbinding met Home
   Assistant: token en eventueel MQTT-wachtwoord; deel dat bestand niet).
+- De Claude-skill `energie-aanbod` in `.claude\skills` in je gebruikersmap (voor Claude Code en de Code-tab).
 - Een Docker-volume `energie_energie-data` met de database. Weghalen: in Docker Desktop de container
   `energie-app` en dat volume verwijderen.
