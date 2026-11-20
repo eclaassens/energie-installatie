@@ -40,12 +40,12 @@ zelf:
 **Bijwerken** naar een nieuwe versie: plak dezelfde regel nog eens in PowerShell. Daarmee pas je ook de
 verbinding aan (kies "j" bij de vraag om ze aan te passen); sensoren en instellingen wijzig je in de app.
 
-**Een aanbod vergelijken**: open je vergelijking op gaslicht.com, klik bij het aanbod op **Hoe is dit bedrag
-opgebouwd?**, kopieer de hele pagina (Ctrl+A, Ctrl+C) en plak die bij Claude met "zet dit aanbod in de energie-app".
-Doe dat voor het goedkoopste vaste en het goedkoopste dynamische aanbod. Met Claude Code of de Code-tab zet Claude het
-zelf in de app; in een gewone chat zegt Claude per veld wat je invult bij **Contract → Aanbod vastleggen**. Heb je de
-ingebouwde browser van de Claude-app, dan kun je daar ook inloggen op gaslicht.com en vragen "haal het aanbod van
-vandaag op". Een aanbod is één dag geldig.
+**Een aanbod vergelijken** (geen Claude nodig): sleep in de app bij **Contract → Aanbod vastleggen** de knop
+**→ Energie-app** naar je bladwijzerbalk. Open op gaslicht.com bij een aanbod **Hoe is dit bedrag opgebouwd?** en klik
+de bladwijzer: de app opent met het aanbod ingevuld, jij klikt **Vastleggen**. Werkt de knop niet, kopieer dan die
+pagina (Ctrl+A, Ctrl+C) en plak hem bovenaan het venster Aanbod vastleggen. Doe het voor het goedkoopste vaste en het
+goedkoopste dynamische aanbod; op **Nu** staat wat ze per jaar schelen. Een aanbod is één dag geldig. Via Claude kan het
+ook: plak de pagina in het gesprek met "zet dit aanbod in de energie-app".
 
 ## Wat er op je pc komt
 

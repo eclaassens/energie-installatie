@@ -257,11 +257,18 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    Overweegt hij een accu op een dynamisch contract: bij Accu → Dynamisch kiest hij bij **Marktprijzen** tussen de
    prijzen van het afgelopen jaar en het niveau van de laatste 30 dagen. Na een periode met hoge prijzen lopen die ver
    uiteen; noem beide en zeg op welk niveau een bedrag staat.
-4. **Aanbiedingen**: het installatiescript zet ook de Claude-skill `energie-aanbod` neer (in `.claude\skills` in de
-   gebruikersmap). Later plakt de gebruiker de tekst van een aanbod op gaslicht.com (pagina **Hoe is dit bedrag
-   opgebouwd?**, Ctrl+A, Ctrl+C) in het gesprek; Claude Code of de Code-tab zet het in de app, een gewone chat zegt per
-   veld wat hij invult bij Contract → Aanbod vastleggen. Met de ingebouwde browser van de Claude-app kan hij ook
-   inloggen op gaslicht.com en vragen "haal het aanbod van vandaag op".
+4. **Aanbiedingen** (wat overstappen scheelt): dat kan de gebruiker zonder Claude, in de app. Wijs hem op
+   **Contract → Aanbod vastleggen**:
+   - **Bladwijzerknop**: onder Aanbod vastleggen staat "Knop voor je browser" met de knop **→ Energie-app**. Laat hem die
+     naar de bladwijzerbalk van zijn browser slepen (bladwijzerbalk tonen: Ctrl+Shift+B). Op gaslicht.com opent hij bij
+     een aanbod **Hoe is dit bedrag opgebouwd?** en klikt de bladwijzer: de app opent met het aanbod ingevuld, hij kijkt
+     het na en klikt **Vastleggen**.
+   - **Plakken**: werkt de knop niet, dan kopieert hij die pagina (Ctrl+A, Ctrl+C) en plakt hem bovenaan het venster
+     Aanbod vastleggen.
+   - Doe het voor het goedkoopste vaste en het goedkoopste dynamische aanbod; op **Nu** staat wat ze per jaar schelen.
+     Een aanbod is één dag geldig.
+   Het installatiescript zet ook de Claude-skill `energie-aanbod` neer (in `.claude\skills` in de gebruikersmap), voor wie
+   het liever via Claude doet.
 5. **MQTT** (als het aan staat): bij Beheer → Status → Home Assistant (MQTT) op **Nu publiceren** en dan **Vergelijk met
    wat HA nu heeft**: alle berichten gelijk. In HA verschijnt het apparaat "Energiecontract".
 
