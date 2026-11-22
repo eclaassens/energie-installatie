@@ -254,9 +254,10 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    laadtoestand en wat de accu oplevert met en zonder saldering. Op Nu gaat de accuvraag dan over een accu erbij.
    Bij Verbruik → Stroom laat **Eigen verbruik** zien wat het huis gebruikte: van het net, rechtstreeks van de zon
    en (met accusensoren) uit de accu.
-   Overweegt hij een accu op een dynamisch contract: bij Accu → Dynamisch kiest hij bij **Marktprijzen** tussen de
-   prijzen van het afgelopen jaar en het niveau van de laatste 30 dagen. Na een periode met hoge prijzen lopen die ver
-   uiteen; noem beide en zeg op welk niveau een bedrag staat.
+   **Reken met marktprijzen** (op Nu, Contract en Accu; één keuze voor de hele app): "zoals nu" rekent een dynamisch
+   contract op het niveau van de laatste 30 dagen, zoals een vast aanbod van vandaag geprijsd is; "van het afgelopen
+   jaar" laat zien waar je uitkomt als de markt terugzakt. Vaste tarieven veranderen niet mee. Na een periode met hoge
+   prijzen lopen die ver uiteen; noem beide en zeg op welke basis een bedrag staat.
 4. **Aanbiedingen** (wat overstappen scheelt): dat kan de gebruiker zonder Claude, in de app. Wijs hem op
    **Contract → Aanbod vastleggen**:
    - **Bladwijzerknop**: onder Aanbod vastleggen staat "Knop voor je browser" met de knop **→ Energie-app**. Laat hem die
