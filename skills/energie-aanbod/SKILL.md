@@ -69,6 +69,7 @@ Vast of variabel contract (`soort` weglaten of `"vast"`):
 | `teruglevering_2027`, `terugleververgoeding_2027` | dezelfde twee vanaf 2027 (zonder saldering); leeg = ongewijzigd | €/kWh |
 | `stroom_vast`, `gas_vast` | vaste leveringskosten per jaar | € |
 | `korting_jaar` | welkomst- of cashbackkorting voor het hele jaar; leeg = 0 | € |
+| `korting_uitbetaling` | `maandelijks` (over max. 12 maanden; wie eerder weggaat mist de resterende maanden) of `einde` (aan het einde uitbetaald; wie eerder weggaat mist alles). Staat op gaslicht onder de korting ("De korting wordt …"); leeg = onbekend | tekst |
 | `notitie` | productnaam en wat opvalt | tekst |
 
 Dynamisch contract (`"soort": "dynamisch"`): `gezien_op`, `leverancier`, `looptijd` (bv. `dynamisch`), en
