@@ -227,6 +227,7 @@ Data. Loop ze met de gebruiker door, in deze volgorde:
    | Netbeheerkosten stroom / gas | €/jaar | maandbedrag × 12 |
    | Vermindering energiebelasting | €/jaar | als **positief** bedrag |
    | Contractkorting | €/jaar | welkomstkorting e.d., anders 0 |
+   | Contractkorting tot en met | datum | geldt de korting maar een jaar (bijna altijd): de laatste dag ervan, anders leeg |
 
    "Geldig vanaf" staat standaard op de eerste dag met meetgegevens; laat dat zo. Een nieuw contract
    komt later als nieuwe periode (Beheer → Tarieven → **Nieuwe periode**; een periode wijzigen of verwijderen:
