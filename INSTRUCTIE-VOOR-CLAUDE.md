@@ -52,6 +52,7 @@ stand", en die lijst toont alleen sensoren met de juiste eenheid.
 | Binnentemperatuur | binnentemperatuur (woonkamer/thermostaat) | °C, measurement |
 | Thuisaccu geladen / ontladen | thuisaccu: energie erin / eruit | kWh, total_increasing; geen accu → geen |
 | Thuisaccu laadtoestand | thuisaccu: laadtoestand | %, measurement |
+| Auto laden uit het net / uit zon | laadvermogen van de auto nu, het deel van het net en het deel van de zon | W of kW, measurement; geen auto of niet los gemeten → geen (optioneel) |
 
 En bij **Beheer → Instellingen**:
 
@@ -79,6 +80,10 @@ Waar je ze vindt:
   dan zijn `stat_energy_to` (laden) en `stat_energy_from` (ontladen) dezelfde tellers. Andere merken (Marstek,
   Anker Solix, …) werken net zo, als er kWh-tellers zijn. Heeft de integratie alleen een vermogen (W), maak dan in
   stap 3 de tellers met een helper.
+
+- **Auto** (optioneel, alleen voor Accu → Dag → Terugspelen): het laadvermogen van de laadpaal of de auto. Meet HA
+  alleen het totaal, kies dat bij "uit het net" en laat "uit zon" leeg. Is er geen laadvermogen, sla het over: de app
+  rekent nergens anders mee (het laden zit al in de meterstanden).
 
 **Gascorrectie**: de leverancier rekent niet met de m³ van de meter, maar met een gecorrigeerd volume. De factor
 staat op de jaarnota bij gas ("correctiefactor", of gecorrigeerd verbruik ÷ gemeten verbruik, bv. 1.022). Vraag om
